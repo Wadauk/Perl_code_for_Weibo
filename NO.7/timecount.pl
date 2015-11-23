@@ -2,7 +2,7 @@
 use POSIX;
 
 open (IN,"<timecount.txt");
-my ($project,$timecount,$other);
+my ($project,$timecount,$other,%hashother);
 while (<IN>){
 	chomp;
 	/(.*)@(.*?)(#.*$)/;
@@ -10,6 +10,7 @@ while (<IN>){
 	$timecount = $2;
 	$other =$3;
 	$hash{$project}=$timecount;
+	$hashother{$project}=$other;
 }
 close IN;
 if (%hash){
@@ -109,7 +110,12 @@ if ($yorn eq "y"){
 	open (OUT, ">timecount.txt");
 	my @keys = sort { $hash{$b} <=> $hash{$a} } keys %hash;
 	for (@keys){
-		print OUT "$_\@$hash{$_}$other\#$start_time\&",int($s/3600),":",int(($s%3600)/60),":",(($s%3600)%60),"\n";
+		if ($_ eq $project){
+			print OUT "$_\@$hash{$_}$hashother{$_}\#$start_time\&",int($s/3600),":",int(($s%3600)/60),":",(($s%3600)%60),"\n";
+		}else{
+			print OUT "$_\@$hash{$_}$hashother{$_}\n";
+		}
+	}
 	close OUT;
 }else{
 	exit;
